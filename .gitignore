@@ -1,0 +1,5 @@
+__pycache__
+.venv
+text_to_speech/audios/*
+text_to_speech/tacotron2_model/*
+text_to_speech/hifigan_model/*
