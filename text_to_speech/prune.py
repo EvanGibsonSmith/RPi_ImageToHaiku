@@ -4,7 +4,6 @@ from speechbrain.inference.vocoders import HIFIGAN
 from speechbrain.inference.TTS import Tacotron2
 from speechbrain.lobes.models.Tacotron2 import Tacotron2 as Manual_Tacotron2
 from speechbrain.utils.text_to_sequence import text_to_sequence
-#from tacotron_model import MyTacotron2 TODO remove this when working other way
 import torch
 import torch.nn as nn
 import torch.nn.utils.prune as prune
