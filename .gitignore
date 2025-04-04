@@ -3,3 +3,4 @@ __pycache__
 text_to_speech/audios/*
 text_to_speech/tacotron2_model/*
 text_to_speech/hifigan_model/*
+text_to_speech/LJSpeech/*

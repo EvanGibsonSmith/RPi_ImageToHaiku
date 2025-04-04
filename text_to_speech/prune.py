@@ -20,7 +20,7 @@ tacotron_state_dict = tacotron2.hparams.model.state_dict()  # Extract state dict
 tacotron_model = tacotron2.hparams.model
 
 hifi_prune_amount = 0.9
-tacotron2_prune_amount = 0.3
+tacotron2_prune_amount = 0.7
 # # # Prune hifi gan
 # TODO not working for hifigan pruning
 for name, module in hifigan_model.named_modules():
@@ -31,7 +31,7 @@ for name, module in hifigan_model.named_modules():
         prune.remove(module, name='weight')  # Permanently remove the pruned weights
 
 # Check the number of pruned weights for each pruned layer
-for name, module in hifigan_model.named_modules():
+for name, module in tacotron2.named_modules():
     if hasattr(module, 'weight'):
         pruned_weights = module.weight == 0  # Identify pruned weights (zeroed out)
         num_pruned = pruned_weights.sum().item()  # Count the pruned weights
@@ -39,15 +39,16 @@ for name, module in hifigan_model.named_modules():
         print(f"Layer {name}: Pruned {num_pruned} out of {total_weights} weights ({(num_pruned / total_weights) * 100:.2f}% pruned)")
 
 # # # Prune tacotron
-for name, module in tacotron_model.named_modules():
-    # Apply pruning to Conv1d or Conv2d layers
-    if hasattr(module, 'weight'):
-        print(f"TacoTron2: Pruning layer {name}")  # Confirm pruning layers
-        prune.l1_unstructured(module, name='weight', amount=tacotron2_prune_amount)  # Prune 30% of the weights
-        prune.remove(module, name='weight')  # Permanently remove the pruned weights
+for i, (name, module) in enumerate(tacotron_model.named_modules()):
+    if i == 10:
+        # Apply pruning to Conv1d or Conv2d layers
+        if hasattr(module, 'weight'):
+            print(f"TacoTron2: Pruning layer {name}")  # Confirm pruning layers
+            prune.l1_unstructured(module, name='weight', amount=tacotron2_prune_amount)  # Prune 30% of the weights
+            prune.remove(module, name='weight')  # Permanently remove the pruned weights
 
 # Check the number of pruned weights for each pruned layer
-for name, module in tacotron_model.named_modules():
+for i, (name, module) in enumerate(tacotron_model.named_modules()):
     if hasattr(module, 'weight'):
         pruned_weights = module.weight == 0  # Identify pruned weights (zeroed out)
         num_pruned = pruned_weights.sum().item()  # Count the pruned weights
