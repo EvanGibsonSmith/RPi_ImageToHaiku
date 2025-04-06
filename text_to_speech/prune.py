@@ -98,6 +98,7 @@ mel_output, mel_length, alignment = tacotron2([sentence])
 #tacotron_manual = Manual_Tacotron2
 
 # Running Vocoder (spectrogram-to-waveform)
+print(mel_output.shape)
 waveforms = hifi_gan.decode_batch(mel_output)
 
 # Save the waveform

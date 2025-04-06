@@ -4,3 +4,4 @@ text_to_speech/audios/*
 text_to_speech/tacotron2_model/*
 text_to_speech/hifigan_model/*
 text_to_speech/LJSpeech/*
+text_to_speech/text_mel_data/*
