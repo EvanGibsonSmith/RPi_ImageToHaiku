@@ -3,7 +3,7 @@ from .haiku_llama import HaikuLlama
 
 class Ternary:
     def __init__(self) -> None:
-        self.haiku_llama = HaikuLlama("arnavsacheti/autotrain-llama-haiku")
+        self.haiku_llama = HaikuLlama()
         self.categories = [
             "nature",
             "love",

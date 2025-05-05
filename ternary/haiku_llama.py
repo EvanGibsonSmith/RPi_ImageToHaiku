@@ -1,17 +1,26 @@
 from typing import Literal
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+from peft import PeftModel
 
 
 class HaikuLlama:
 
-    def __init__(self, model_repo: str = "arnavsacheti/autotrain-llama-haiku") -> None:
-        self.model_repo = model_repo
+    def __init__(
+        self,
+        adapter_repo: str = "arnavsacheti/autotrain-llama-haiku",
+        base_model_repo: str = "meta-llama/Llama-3.1-8B-Instruct",
+    ) -> None:
+        self.adapter_repo = adapter_repo
+        self.base_model_repo = base_model_repo
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_repo)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            self.model_repo, device_map=self.device, torch_dtype="auto"
+        self.tokenizer = AutoTokenizer.from_pretrained(self.base_model_repo)
+        base_model = AutoModelForCausalLM.from_pretrained(
+            self.base_model_repo, device_map="auto", torch_dtype="auto"
         )
+        self.model = PeftModel.from_pretrained(
+            base_model, self.adapter_repo, device_map="auto", torch_dtype="auto"
+        ).to(self.device)
         self.model.eval()
 
     @property
@@ -51,13 +60,13 @@ class HaikuLlama:
             return_tensors="pt",
         ).to(self.device)
 
-        output_ids = self.model.generate(input_ids)
+        output_ids = self.model.generate(input_ids, max_new_tokens=256)
         response = self.tokenizer.decode(
             output_ids[0][input_ids.shape[1] :], skip_special_tokens=True
         )
 
         return response
-    
+
     def __call__(self, categories: list[str]) -> str:
         """
         Generate a haiku based on the provided categories.
