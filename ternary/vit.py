@@ -114,33 +114,17 @@ class ViT:
         # Get input and output tensors
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
-        return interpreter, input_details, output_details
+        self.interpreter = interpreter
+        self.input_details = input_details
+        self.output_details = output_details
 
     def __call__(
         self,
-        image_input: np.ndarray = np.array([]),
-        interpreter: None = None,
-        input_details: None = None,
-        output_details: None = None,
+        image_input: np.ndarray = np.array([])
     ) -> list[str]:
-        interpreter.set_tensor(input_details[0]["index"], image_input)
-        interpreter.invoke()
-        output_data = interpreter.get_tensor(
-            output_details[0]["index"]
+        self.interpreter.set_tensor(self.input_details[0]["index"], image_input)
+        self.interpreter.invoke()
+        output_data = self.interpreter.get_tensor(
+            self.output_details[0]["index"]
         )  # np.array of shape (1, 100)
         return [cifar100_fine_labels[np.argsort(output_data[0])[-i]] for i in range(5)]
-
-    def test(self):
-        interpreter, input_details, output_details = start()
-        (x_train, y_train), (x_test, y_test) = cf.load_data()
-        for idx in range(100):
-            input_image = np.array([x_test[idx]], dtype=np.float32)
-            input_class = y_test[idx]
-            output_data = run(
-                image_input=input_image,
-                interpreter=interpreter,
-                input_details=input_details,
-                output_details=output_details,
-            )
-            print("Predicted: ", output_data)
-            print("Truth:     ", cifar100_fine_labels[input_class[0]])
