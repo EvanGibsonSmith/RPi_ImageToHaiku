@@ -38,36 +38,7 @@ class TextToSpeech:
         return out
 
 if __name__=="__main__":
-    vit = ViT(path="ternary/model.tflite")
-    #haiku_llama = HaikuLlama()
     tts = TextToSpeech(tacotron_state_dict_path="d30e20.pth")
     tts("Doctor Livingston I assume, clever to say.")
 
-    # Load dummy CIFAR-100
-    transform = transforms.Compose([
-        transforms.ToTensor(),  # Converts to shape (C, H, W), range [0.0, 1.0]
-    ])
-
-    # Load the test set
-    img_idx = 0
-    cifar100_test = datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
-
-    # Load the CIFAR-100 dataset
-    (x_train, y_train), (x_test, y_test) = cifar100.load_data()
-
-    # Select a real image (for example, the first test image)
-    real_image = np.expand_dims(x_test[0], axis=0).astype(np.float32)  # Shape (1, 32, 32, 3)
-
-    # Now pass the real image to your model
-    output_data = vit(real_image)
-    print("Predictions for real image:", output_data)
-
-    # Get one sample
-    image_tensor, label = cifar100_test[img_idx]  # image_tensor is shape (3, 32, 32)
-    image_tensor = image_tensor.numpy()
-
-    classes = vit(image_tensor)
-    print(classes)
-    #haiku = haiku_llama(classes)
-    
 
