@@ -1,12 +1,11 @@
 from speechbrain.inference.vocoders import HIFIGAN
 from speechbrain.inference.TTS import Tacotron2
-from scipy.io.wavefile import write
+from scipy.io.wavfile import write
 import numpy as np
 import torch
 import numpy as np
 from torchvision import datasets, transforms
 #from haiku_llama import HaikuLlama
-from vit import ViT
 import subprocess
 import os
 
@@ -30,12 +29,13 @@ class TextToSpeech:
 
     def __call__(self, sentence):
         # Run tacotron
+        print(sentence)
         mel_output, mel_length, alignment = self.tacotron2([sentence])
 
         waveforms = self.hifi_gan.decode_batch(mel_output)
-        out = waveforms.squeeze(0).squeeze(0)
-
-        audio_array = audio_array / np.max(np.abs(audio_array))
+        out = waveforms.squeeze().cpu().detach().numpy()
+        print(out)
+        audio_array = out / np.max(np.abs(out))
         audio_int16 = (audio_array * 32767).astype(np.int16)
 
         write("temp.wav", 22050, audio_int16)
