@@ -1,9 +1,12 @@
+from .camera import Camera
 from .haiku_llama import HaikuLlama
 
 
 class Ternary:
     def __init__(self) -> None:
+        self.camera = Camera()
         self.haiku_llama = HaikuLlama()
+
         self.categories = [
             "nature",
             "love",
@@ -17,8 +20,6 @@ class Ternary:
             "balance",
         ]
 
-    def __run__(self) -> None:
-        print(self.haiku_llama(self.categories))
-
     def __call__(self) -> None:
-        self.__run__()
+        _ = self.camera()
+        print(self.haiku_llama(self.categories))

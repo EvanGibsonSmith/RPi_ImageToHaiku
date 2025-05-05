@@ -32,11 +32,13 @@ class HaikuLlama:
         else:
             return "cpu"
 
-    def __run__(self, categories: list[str]) -> str:
+    def __call__(self, categories: list[str]) -> str:
         """
-        Generates a haiku based on the provided categories.
+        Generate a haiku based on the provided categories.
+
         Args:
-            categories (list[str]): A list of categories to include in the haiku.
+            categories (list[str]): A list of categories to base the haiku on.
+
         Returns:
             str: The generated haiku.
         """
@@ -66,15 +68,3 @@ class HaikuLlama:
         )
 
         return response
-
-    def __call__(self, categories: list[str]) -> str:
-        """
-        Generate a haiku based on the provided categories.
-
-        Args:
-            categories (list[str]): A list of categories to base the haiku on.
-
-        Returns:
-            str: The generated haiku.
-        """
-        return self.__run__(categories)
