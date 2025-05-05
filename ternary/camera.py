@@ -18,8 +18,8 @@ class Camera:
         if ret:
             frame = cv2.resize(frame, (32, 32))
 
-        cv2.imshow("Camera", frame)
-        cv2.waitKey(0)
+ #       cv2.imshow("Camera", frame)
+#        cv2.waitKey(0)
         return np.array([frame], dtype=np.float32)
 
     def __del__(self):

@@ -8,17 +8,22 @@ def main() -> None:
         description="A Ternary AI assistant for Raspberry Pi.",
     )
     parser.add_argument(
-        "haiku-llama-path",
+        "llama_path",
         type=str,
         default="models/llama-7b.gguf",
         help="Path to the Haiku Llama model.",
     )
 
+    parser.add_argument(
+       "vit_path",
+       type=str,
+    )
+
     args = parser.parse_args()
-    haiku_llama_path = args.haiku_llama_path
+    haiku_llama_path = args.llama_path
+    vit_path = args.vit_path
     if not haiku_llama_path:
         raise ValueError("Please provide a path to the Haiku Llama model.")
 
-    ternary_pi = Ternary(haiku_llama_path)
-
+    ternary_pi = Ternary(haiku_llama_path, vit_path)
     ternary_pi()
