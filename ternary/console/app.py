@@ -1,5 +1,12 @@
+import RPi.GPIO as GPIO
+
+
 import argparse
 from ternary import Ternary
+
+PIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # internal pull‑up
 
 
 def main() -> None:
@@ -15,13 +22,13 @@ def main() -> None:
     )
 
     parser.add_argument(
-       "vit_path",
-       type=str,
+        "vit_path",
+        type=str,
     )
 
     parser.add_argument(
-       "tts_path",
-       type=str,
+        "tts_path",
+        type=str,
     )
 
     args = parser.parse_args()
@@ -32,4 +39,9 @@ def main() -> None:
         raise ValueError("Please provide a path to the Haiku Llama model.")
 
     ternary_pi = Ternary(haiku_llama_path, vit_path, tts_path)
+
+    print("Waiting for button…")
+    GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
     ternary_pi()
+
+    GPIO.cleanup()
