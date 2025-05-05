@@ -1,3 +1,4 @@
 # Python Build Files
 __pycache__
 *.pth
+*.gguf

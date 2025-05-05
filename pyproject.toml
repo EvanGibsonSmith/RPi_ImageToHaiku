@@ -12,6 +12,9 @@ dependencies = [
   "peft (>=0.15.2,<0.16.0)",
   "opencv-python (>=4.11.0.86,<5.0.0.0)",
   "llama-cpp-python (>=0.3.8,<0.4.0)",
+  "speechbrain (>=1.0.3,<2.0.0)",
+  "scipy (>=1.15.2,<2.0.0)",
+  "torchvision (>=0.22.0,<0.23.0)",
 ]
 
 [tool.poetry]
