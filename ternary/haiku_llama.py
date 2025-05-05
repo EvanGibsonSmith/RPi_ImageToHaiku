@@ -1,70 +1,81 @@
-from typing import Literal
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
-from peft import PeftModel
+import os
+from llama_cpp import Llama  # pip install llama-cpp-python
 
 
 class HaikuLlama:
+    """
+    Tiny helper around llama-cpp-python.
+
+    Example
+    -------
+    >>> from haiku_llama import HaikuLlama
+    >>> llm = HaikuLlama("models/lora-model.q4_0.gguf")
+    >>> print(llm("Write a haiku about pruning weights.", max_tokens=60))
+    """
 
     def __init__(
         self,
-        adapter_repo: str = "arnavsacheti/autotrain-llama-haiku",
-        base_model_repo: str = "meta-llama/Llama-3.1-8B-Instruct",
-    ) -> None:
-        self.adapter_repo = adapter_repo
-        self.base_model_repo = base_model_repo
-
-        self.tokenizer = AutoTokenizer.from_pretrained(self.base_model_repo)
-        base_model = AutoModelForCausalLM.from_pretrained(
-            self.base_model_repo, device_map=self.device, torch_dtype="auto"
-        )
-        self.model = PeftModel.from_pretrained(
-            base_model, self.adapter_repo, device_map=self.device, torch_dtype="auto"
-        ).to(self.device)
-        self.model.eval()
-
-    @property
-    def device(self) -> Literal["cuda", "mps", "cpu"]:
-        # if torch.cuda.is_available():
-        #     return "cuda"
-        # elif torch.backends.mps.is_available():
-        #     return "mps"
-        # else:
-        return "cpu"
-
-    def __call__(self, categories: list[str]) -> str:
+        model_path: str,
+        n_ctx: int = 4096,
+        n_threads: int | None = None,
+        **llama_kwargs,
+    ):
         """
-        Generate a haiku based on the provided categories.
-
-        Args:
-            categories (list[str]): A list of categories to base the haiku on.
-
-        Returns:
-            str: The generated haiku.
+        Parameters
+        ----------
+        model_path : str
+            Path to the *.gguf* file you produced with `quantize`.
+        n_ctx : int, default 4096
+            Context window (tokens). 4096 is safe for 7‑B models on a Pi‑5 or desktop.
+        n_threads : int | None
+            CPU threads to use. None → `os.cpu_count()`.
+        llama_kwargs : dict
+            Any extra kwargs accepted by `llama_cpp.Llama`
+            (e.g. n_gpu_layers, rope_freq_base).
         """
-        if not categories:
-            raise ValueError("Categories list cannot be empty.")
-        message = [
-            {
-                "role": "system",
-                "content": "You are a poet specialising in creating Haiku. \nYour haiku consist of three lines, with five syllables in the first line, seven in the second, and five in the third.\nBeyond being technically correct, your haiku should also be beautiful and meaningful. \n Output ONLY one Haiku.",
-            },
-            {
-                "role": "user",
-                "content": f"Can you compose a singular haiku about these {len(categories)} categories: \"{', '.join(categories)}",
-            },
-        ]
-
-        input_ids = self.tokenizer.apply_chat_template(
-            conversation=message,
-            tokenize=True,
-            add_generation_prompt=True,
-            return_tensors="pt",
-        ).to(self.device)
-
-        output_ids = self.model.generate(input_ids, max_new_tokens=256)
-        response = self.tokenizer.decode(
-            output_ids[0][input_ids.shape[1] :], skip_special_tokens=True
+        self.llm = Llama(
+            model_path=model_path,
+            n_ctx=n_ctx,
+            n_threads=n_threads or os.cpu_count(),
+            **llama_kwargs,
         )
 
-        return response
+    def __call__(
+        self,
+        categories: list[str],
+        max_tokens: int = 256,
+        temperature: float = 0.7,
+        stop: list[str] | None = None,
+        **gen_kwargs,
+    ) -> str:
+        """
+        Run a single prompt and return the generated text.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to feed the model (plain text).
+        max_tokens : int, default 256
+            Maximum new tokens to generate.
+        temperature : float, default 0.7
+            Sampling temperature (0 → deterministic).
+        stop : list[str] | None
+            Optional stop strings.
+        gen_kwargs : dict
+            Any additional generation kwargs accepted by `llm(...)`
+            (top_p, repeat_penalty, etc.).
+
+        Returns
+        -------
+        str
+            The model’s reply (text only).
+        """
+        out = self.llm(
+            f"Can you compose a singular haiku about these {len(categories)} categories: \"{', '.join(categories)}\"",
+            max_tokens=max_tokens,
+            temperature=temperature,
+            stop=stop,
+            **gen_kwargs,
+        )
+        # llama-cpp-python returns a dict with 'choices'
+        return out["choices"][0]["text"].lstrip()
