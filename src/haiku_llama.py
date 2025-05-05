@@ -1,0 +1,71 @@
+from typing import Literal
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+
+class HaikuLlama:
+
+    def __init__(self, model_repo: str = "arnavsacheti/autotrain-llama-haiku") -> None:
+        self.model_repo = model_repo
+
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_repo)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_repo, device_map=self.device, torch_dtype="auto"
+        )
+        self.model.eval()
+
+    @property
+    def device(self) -> Literal["cuda", "mps", "cpu"]:
+        if torch.cuda.is_available():
+            return "cuda"
+        elif torch.backends.mps.is_available():
+            return "mps"
+        else:
+            return "cpu"
+
+    def __run__(self, categories: list[str]) -> str:
+        """
+        Generates a haiku based on the provided categories.
+        Args:
+            categories (list[str]): A list of categories to include in the haiku.
+        Returns:
+            str: The generated haiku.
+        """
+        if not categories:
+            raise ValueError("Categories list cannot be empty.")
+        message = [
+            {
+                "role": "system",
+                "content": "You are a poet specialising in creating Haiku. \nYour haiku consist of three lines, with five syllables in the first line, seven in the second, and five in the third.\nBeyond being technically correct, your haiku should also be beautiful and meaningful",
+            },
+            {
+                "role": "user",
+                "content": f"Can you compose a haiku about these {len(categories)} categories: \"{' '.join(categories)}",
+            },
+        ]
+
+        input_ids = self.tokenizer.apply_chat_template(
+            conversation=message,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_tensors="pt",
+        ).to(self.device)
+
+        output_ids = self.model.generate(input_ids)
+        response = self.tokenizer.decode(
+            output_ids[0][input_ids.shape[1] :], skip_special_tokens=True
+        )
+
+        return response
+    
+    def __call__(self, categories: list[str]) -> str:
+        """
+        Generate a haiku based on the provided categories.
+
+        Args:
+            categories (list[str]): A list of categories to base the haiku on.
+
+        Returns:
+            str: The generated haiku.
+        """
+        return self.__run__(categories)
