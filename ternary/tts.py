@@ -1,12 +1,14 @@
 from speechbrain.inference.vocoders import HIFIGAN
 from speechbrain.inference.TTS import Tacotron2
-import sounddevice as sd
+from scipy.io.wavefile import write
 import numpy as np
 import torch
 import numpy as np
 from torchvision import datasets, transforms
 #from haiku_llama import HaikuLlama
 from vit import ViT
+import subprocess
+import os
 
 class TextToSpeech:
 
@@ -33,8 +35,16 @@ class TextToSpeech:
         waveforms = self.hifi_gan.decode_batch(mel_output)
         out = waveforms.squeeze(0).squeeze(0)
 
-        sd.play(out, 22050)
-        sd.wait()
+        audio_array = audio_array / np.max(np.abs(audio_array))
+        audio_int16 = (audio_array * 32767).astype(np.int16)
+
+        write("temp.wav", 22050, audio_int16)
+
+        try:
+             subprocess.run(["aplay", "temp.wav"], check=True)
+        except FileNotFoundError:
+             print("error")
+
         return out
 
 if __name__=="__main__":
