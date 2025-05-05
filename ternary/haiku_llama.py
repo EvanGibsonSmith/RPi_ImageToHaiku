@@ -71,7 +71,9 @@ class HaikuLlama:
             The model’s reply (text only).
         """
         out = self.llm(
-            f"Can you compose a singular haiku about these {len(categories)} categories: \"{', '.join(categories)}\"",
+            f"Can you compose a singular haiku about these {len(categories)} categories: \"{', '.join(categories)}\"."
+            " This is being fed to a TTS model, so it should be short and sweet."
+            " Please do not include any extra text.",
             max_tokens=max_tokens,
             temperature=temperature,
             stop=stop,
