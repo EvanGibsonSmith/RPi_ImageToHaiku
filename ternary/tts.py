@@ -36,7 +36,8 @@ class TextToSpeech:
         out = waveforms.squeeze().cpu().detach().numpy()
         print(out)
         audio_array = out / np.max(np.abs(out))
-        audio_int16 = (audio_array * 32767).astype(np.int16)
+        audio_int16 = (out*32767).astype(np.int16)
+        print(audio_int16)
 
         write("temp.wav", 22050, audio_int16)
 

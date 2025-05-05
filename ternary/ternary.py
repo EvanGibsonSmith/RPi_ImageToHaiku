@@ -12,5 +12,7 @@ class Ternary:
     def __call__(self) -> None:
         frame = self.camera()
         classes = self.vit(frame)
-#        print(self.haiku_llama(classes))
-        self.talker(classes[0])
+        print(classes)
+        text_out = self.haiku_llama(classes, 32)
+        print(text_out)
+        self.talker(text_out)
