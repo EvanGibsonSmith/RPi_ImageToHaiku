@@ -19,11 +19,17 @@ def main() -> None:
        type=str,
     )
 
+    parser.add_argument(
+       "tts_path",
+       type=str,
+    )
+
     args = parser.parse_args()
     haiku_llama_path = args.llama_path
     vit_path = args.vit_path
+    tts_path = args.tts_path
     if not haiku_llama_path:
         raise ValueError("Please provide a path to the Haiku Llama model.")
 
-    ternary_pi = Ternary(haiku_llama_path, vit_path)
+    ternary_pi = Ternary(haiku_llama_path, vit_path, tts_path)
     ternary_pi()
