@@ -40,8 +40,13 @@ def main() -> None:
 
     ternary_pi = Ternary(haiku_llama_path, vit_path, tts_path)
 
-    print("Waiting for button…")
-    GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
-    ternary_pi()
-
-    GPIO.cleanup()
+    try:
+        while True:
+            print("Waiting for button…")
+            GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
+            ternary_pi(verbose=True)
+    except KeyboardInterrupt:
+        print("Exiting…")
+    finally:
+        print("Cleaning up GPIO…")
+        GPIO.cleanup()

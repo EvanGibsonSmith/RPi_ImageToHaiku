@@ -11,10 +11,12 @@ class Ternary:
         self.haiku_llama = HaikuLlama(haiku_llama_path)
         self.talker = TextToSpeech(tts_path)
 
-    def __call__(self) -> None:
+    def __call__(self, verbose: bool = False) -> None:
         frame = self.camera()
         classes = self.vit(frame)
-        # print(classes)
+        if verbose:
+            print(classes)
         text_out = self.haiku_llama(classes, 32, stop=["note"])
-        # print(text_out)
+        if verbose:
+            print(text_out)
         self.talker(text_out)
