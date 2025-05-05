@@ -16,21 +16,21 @@ class HaikuLlama:
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.base_model_repo)
         base_model = AutoModelForCausalLM.from_pretrained(
-            self.base_model_repo, device_map="auto", torch_dtype="auto"
+            self.base_model_repo, device_map=self.device, torch_dtype="auto"
         )
         self.model = PeftModel.from_pretrained(
-            base_model, self.adapter_repo, device_map="auto", torch_dtype="auto"
+            base_model, self.adapter_repo, device_map=self.device, torch_dtype="auto"
         ).to(self.device)
         self.model.eval()
 
     @property
     def device(self) -> Literal["cuda", "mps", "cpu"]:
-        if torch.cuda.is_available():
-            return "cuda"
-        elif torch.backends.mps.is_available():
-            return "mps"
-        else:
-            return "cpu"
+        # if torch.cuda.is_available():
+        #     return "cuda"
+        # elif torch.backends.mps.is_available():
+        #     return "mps"
+        # else:
+        return "cpu"
 
     def __call__(self, categories: list[str]) -> str:
         """
@@ -47,11 +47,11 @@ class HaikuLlama:
         message = [
             {
                 "role": "system",
-                "content": "You are a poet specialising in creating Haiku. \nYour haiku consist of three lines, with five syllables in the first line, seven in the second, and five in the third.\nBeyond being technically correct, your haiku should also be beautiful and meaningful",
+                "content": "You are a poet specialising in creating Haiku. \nYour haiku consist of three lines, with five syllables in the first line, seven in the second, and five in the third.\nBeyond being technically correct, your haiku should also be beautiful and meaningful. \n Output ONLY one Haiku.",
             },
             {
                 "role": "user",
-                "content": f"Can you compose a haiku about these {len(categories)} categories: \"{' '.join(categories)}",
+                "content": f"Can you compose a singular haiku about these {len(categories)} categories: \"{', '.join(categories)}",
             },
         ]
 
