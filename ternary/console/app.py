@@ -44,6 +44,8 @@ def main() -> None:
         while True:
             print("Waiting for button…")
             GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
+            print("Button pressed!")
+            
             ternary_pi(verbose=True)
     except KeyboardInterrupt:
         print("Exiting…")
