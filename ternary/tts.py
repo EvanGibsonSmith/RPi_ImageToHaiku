@@ -4,14 +4,13 @@ import sounddevice as sd
 import numpy as np
 import torch
 import numpy as np
-from tensorflow.keras.datasets import cifar100
 from torchvision import datasets, transforms
 #from haiku_llama import HaikuLlama
 from vit import ViT
 
 class TextToSpeech:
 
-    def __init__(self):
+    def __init__(self, tacotron_state_dict_path):
         self.hifi_gan = HIFIGAN.from_hparams(source="speechbrain/tts-hifigan-ljspeech", savedir="text_to_speech/hifigan_model")
         self.hifigan_state_dict = self.hifi_gan.hparams.generator.state_dict()  # Extract state dictionary
         self.hifigan_model = self.hifi_gan.hparams.generator
@@ -19,6 +18,13 @@ class TextToSpeech:
         self.tacotron2 = Tacotron2.from_hparams(source="speechbrain/tts-tacotron2-ljspeech", savedir="text_to_speech/tacotron2_model")
         self.tacotron_state_dict = self.tacotron2.hparams.model.state_dict()  # Extract state dictionary
         self.tacotron_model = self.tacotron2.hparams.model
+
+        # Ensure that the loaded state dict matches the model
+        self.tacotron_model = self.tacotron2.hparams.model
+
+        # Load the custom state dict
+        tacotron_state_dict = torch.load(tacotron_state_dict_path)
+        self.tacotron_model.load_state_dict(tacotron_state_dict)
 
     def __call__(self, sentence):
         # Run tacotron
@@ -34,7 +40,8 @@ class TextToSpeech:
 if __name__=="__main__":
     vit = ViT(path="ternary/model.tflite")
     #haiku_llama = HaikuLlama()
-    #tts = TextToSpeech()
+    tts = TextToSpeech(tacotron_state_dict_path="d30e20.pth")
+    tts("Doctor Livingston I assume, clever to say.")
 
     # Load dummy CIFAR-100
     transform = transforms.Compose([
@@ -62,5 +69,5 @@ if __name__=="__main__":
     classes = vit(image_tensor)
     print(classes)
     #haiku = haiku_llama(classes)
-    #tts(haiku)
+    
 
