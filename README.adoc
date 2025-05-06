@@ -2,147 +2,17 @@
 
 == Setup
 
-To set up a fresh Raspberry Pi with the necessary tools and clone the `microsoft/BitNet` repository, follow these steps:
+Download the models from Google Drive and place them in the models directory, after that you can run the model by installing the repo and running ternary.
 
-1. **Update and Upgrade the System**
-   
-  Open a terminal and run the following commands to update and upgrade your system:
-+
-[source,bash]
-----
-sudo apt-get update
-sudo apt-get upgrade
-----
+```bash
 
-2. **Install LLVM**
+python -m venv .venv
+source .venv bin activate
 
-  Install LLVM and prerequisites:
-+
-[source,bash]
-----
-sudo apt install lsb-release wget software-properties-common gnupg
-----
+pip install .
+ternary --llama_path models/lora-model.q4_0.gguf --vit_path models/model.tflite --tts_path models/d30e20.pth
 
-3. **Install miniconda3**
+```
 
-  Install miniconda3:
-+
-[source,bash]
-----
-mkdir -p ~/miniconda3
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-----
-
-  Source the initialization script:
-+
-[source,bash]
-----
-source ~/miniconda3/bin/activate
-----
-
-  Setup miniconda3 for all shells:
-+
-[source,bash]
-----
-conda init --all
-----
-
-  For more details, refer to the [Miniconda Installation Guide](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) for Linux and ARM64.
-
-4. **Clone the `microsoft/BitNet` Repository**
-
-  Navigate to the directory where you want to clone the repository and run:
-
-+
-[source,bash]
-----
-git clone --recursive https://github.com/microsoft/BitNet.git
-cd BitNet
-----
-
-5. **Create a Conda Virtual Environment**
-
-  Create the conda virtual environment and install the required packages:
-
-+
-[source,bash]
-----
-# (Recommended) Create a new conda environment
-conda create -n bitnet-cpp python=3.9
-conda activate bitnet-cpp
-
-pip install -r requirements.txt
-----
-
-Your Raspberry Pi is now set up with the necessary tools and the `microsoft/BitNet` repository is cloned.
-
-== Running BitNet
-
-1. **Download the model from Hugging Face**
-
-  Download the model from Hugging Face using the following command:
-
-+
-[source,bash]
-----
-# Download the model from Hugging Face, convert it to quantized gguf format, and build the project
-python setup_env.py --hf-repo 1bitLLM/bitnet_b1_58-large -q i2_s
-----
-+
-[source,bash]
-----
-usage: setup_env.py [-h] [--hf-repo {1bitLLM/bitnet_b1_58-large,1bitLLM/bitnet_b1_58-3B,HF1BitLLM/Llama3-8B-1.58-100B-tokens,tiiuae/Falcon3-1B-Instruct-1.58bit,tiiuae/Falcon3-3B-Instruct-1.58bit,tiiuae/Falcon3-7B-Instruct-1.58bit,tiiuae/Falcon3-10B-Instruct-1.58bit}] [--model-dir MODEL_DIR] [--log-dir LOG_DIR] [--quant-type {i2_s,tl1}] [--quant-embd]
-                    [--use-pretuned]
-
-Setup the environment for running inference
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --hf-repo {1bitLLM/bitnet_b1_58-large,1bitLLM/bitnet_b1_58-3B,HF1BitLLM/Llama3-8B-1.58-100B-tokens,tiiuae/Falcon3-1B-Instruct-1.58bit,tiiuae/Falcon3-3B-Instruct-1.58bit,tiiuae/Falcon3-7B-Instruct-1.58bit,tiiuae/Falcon3-10B-Instruct-1.58bit}, -hr {1bitLLM/bitnet_b1_58-large,1bitLLM/bitnet_b1_58-3B,HF1BitLLM/Llama3-8B-1.58-100B-tokens,tiiuae/Falcon3-1B-Instruct-1.58bit,tiiuae/Falcon3-3B-Instruct-1.58bit,tiiuae/Falcon3-7B-Instruct-1.58bit,tiiuae/Falcon3-10B-Instruct-1.58bit}
-                        Model used for inference
-  --model-dir MODEL_DIR, -md MODEL_DIR
-                        Directory to save/load the model
-  --log-dir LOG_DIR, -ld LOG_DIR
-                        Directory to save the logging info
-  --quant-type {i2_s,tl1}, -q {i2_s,tl1}
-                        Quantization type
-  --quant-embd          Quantize the embeddings to f16
-  --use-pretuned, -p    Use the pretuned kernel parameters
-----
-
-2. **Run Inference**
-
-  Run inference using the following command:
-  
-+
-[source,bash]
-----
-# Run inference with the quantized model
-python run_inference.py -m models/Falcon3-7B-Instruct-1.58bit/ggml-model-i2_s.gguf -p "You are a helpful assistant" -cnv
-----
-+
-[source,bash]
-----
-usage: run_inference.py [-h] [-m MODEL] [-n N_PREDICT] -p PROMPT [-t THREADS] [-c CTX_SIZE] [-temp TEMPERATURE] [-cnv]
-
-Run inference
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -m MODEL, --model MODEL
-                        Path to model file
-  -n N_PREDICT, --n-predict N_PREDICT
-                        Number of tokens to predict when generating text
-  -p PROMPT, --prompt PROMPT
-                        Prompt to generate text from
-  -t THREADS, --threads THREADS
-                        Number of threads to use
-  -c CTX_SIZE, --ctx-size CTX_SIZE
-                        Size of the prompt context
-  -temp TEMPERATURE, --temperature TEMPERATURE
-                        Temperature, a hyperparameter that controls the randomness of the generated text
-  -cnv, --conversation  Whether to enable chat mode or not (for instruct models.)
-                        (When this option is turned on, the prompt specified by -p will be used as the system prompt.)
-----
+== Hardware
+Requires a system with a camera and speaker setup.
