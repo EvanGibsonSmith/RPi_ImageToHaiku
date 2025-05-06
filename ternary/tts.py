@@ -9,7 +9,7 @@ import subprocess
 
 class TextToSpeech:
 
-    def __init__(self, tacotron_state_dict_path):
+    def __init__(self, tacotron_state_dict_path) -> None:
         self.hifi_gan = HIFIGAN.from_hparams(source="speechbrain/tts-hifigan-ljspeech", savedir="text_to_speech/hifigan_model")
         self.hifigan_state_dict = self.hifi_gan.hparams.generator.state_dict()  # Extract state dictionary
         self.hifigan_model = self.hifi_gan.hparams.generator
@@ -25,7 +25,7 @@ class TextToSpeech:
         tacotron_state_dict = torch.load(tacotron_state_dict_path)
         self.tacotron_model.load_state_dict(tacotron_state_dict)
 
-    def __call__(self, sentence):
+    def __call__(self, sentence: str, play_cmd: str = "aplay") -> None:
         # Run tacotron
         # print(sentence)
         mel_output, mel_length, alignment = self.tacotron2([sentence])

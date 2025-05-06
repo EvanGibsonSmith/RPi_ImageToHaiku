@@ -2,3 +2,4 @@
 __pycache__
 *.pth
 *.gguf
+text_to_speech
