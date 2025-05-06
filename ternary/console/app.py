@@ -1,6 +1,5 @@
 import RPi.GPIO as GPIO
-
-
+import pyttsx3
 import argparse
 from ternary import Ternary
 
@@ -17,18 +16,22 @@ def main() -> None:
     parser.add_argument(
         "llama_path",
         type=str,
-        default="models/llama-7b.gguf",
+        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/lora-model.q4_0.gguf",
         help="Path to the Haiku Llama model.",
     )
 
     parser.add_argument(
         "vit_path",
         type=str,
+        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/model.tflite",
+        help="Path to the Vision Transformer model.",
     )
 
     parser.add_argument(
         "tts_path",
         type=str,
+        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/d30e20.pth",
+        help="Path to the Text-to-Speech model.",
     )
 
     args = parser.parse_args()
@@ -38,14 +41,18 @@ def main() -> None:
     if not haiku_llama_path:
         raise ValueError("Please provide a path to the Haiku Llama model.")
 
+    engine = pyttsx3.init()
+
     ternary_pi = Ternary(haiku_llama_path, vit_path, tts_path)
 
     try:
         while True:
-            print("Waiting for button…")
+            engine.say("Waiting for button…")
+            engine.runAndWait()
             GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
-            print("Button pressed!")
-            
+            engine.say("Button pressed!")
+            engine.runAndWait()
+
             ternary_pi(verbose=True)
     except KeyboardInterrupt:
         print("Exiting…")
