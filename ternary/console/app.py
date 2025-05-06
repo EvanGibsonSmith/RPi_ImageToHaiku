@@ -46,6 +46,7 @@ def main() -> None:
     try:
         while True:
             try:
+                print("Waiting for button press…")
                 subprocess.run(
                     [
                         "aplay",
@@ -60,6 +61,7 @@ def main() -> None:
             GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
 
             try:
+                print("Button pressed!")
                 subprocess.run(
                     [
                         "aplay",
