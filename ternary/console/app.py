@@ -14,21 +14,21 @@ def main() -> None:
         description="A Ternary AI assistant for Raspberry Pi.",
     )
     parser.add_argument(
-        "llama_path",
+        "--llama_path",
         type=str,
         default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/lora-model.q4_0.gguf",
         help="Path to the Haiku Llama model.",
     )
 
     parser.add_argument(
-        "vit_path",
+        "--vit_path",
         type=str,
         default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/model.tflite",
         help="Path to the Vision Transformer model.",
     )
 
     parser.add_argument(
-        "tts_path",
+        "--tts_path",
         type=str,
         default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/d30e20.pth",
         help="Path to the Text-to-Speech model.",
