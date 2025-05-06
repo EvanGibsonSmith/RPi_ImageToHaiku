@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import pyttsx3
+
 import argparse
 from ternary import Ternary
 
@@ -41,17 +41,13 @@ def main() -> None:
     if not haiku_llama_path:
         raise ValueError("Please provide a path to the Haiku Llama model.")
 
-    engine = pyttsx3.init()
-
     ternary_pi = Ternary(haiku_llama_path, vit_path, tts_path)
 
     try:
         while True:
-            engine.say("Waiting for button…")
-            engine.runAndWait()
+            print("Waiting for button…")
             GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
-            engine.say("Button pressed!")
-            engine.runAndWait()
+            print("Button pressed!")
 
             ternary_pi(verbose=True)
     except KeyboardInterrupt:
