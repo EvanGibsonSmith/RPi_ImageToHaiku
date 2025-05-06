@@ -4,10 +4,8 @@ from scipy.io.wavfile import write
 import numpy as np
 import torch
 import numpy as np
-from torchvision import datasets, transforms
-#from haiku_llama import HaikuLlama
+
 import subprocess
-import os
 
 class TextToSpeech:
 

@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
-
 import argparse
 from ternary import Ternary
+import subprocess
 
 PIN = 17
 GPIO.setmode(GPIO.BCM)
@@ -16,21 +16,21 @@ def main() -> None:
     parser.add_argument(
         "--llama_path",
         type=str,
-        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/lora-model.q4_0.gguf",
+        default="/home/arnavsacheti/Documents/Ternary-Pi/models/lora-model.q4_0.gguf",
         help="Path to the Haiku Llama model.",
     )
 
     parser.add_argument(
         "--vit_path",
         type=str,
-        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/model.tflite",
+        default="/home/arnavsacheti/Documents/Ternary-Pi/models/model.tflite",
         help="Path to the Vision Transformer model.",
     )
 
     parser.add_argument(
         "--tts_path",
         type=str,
-        default="/Users/arnavsacheti/Documents/GitHub/Ternary-Pi/models/d30e20.pth",
+        default="/home/arnavsacheti/Documents/Ternary-Pi/models/d30e20.pth",
         help="Path to the Text-to-Speech model.",
     )
 
@@ -45,9 +45,32 @@ def main() -> None:
 
     try:
         while True:
-            print("Waiting for button…")
+            try:
+                subprocess.run(
+                    [
+                        "aplay",
+                        "/home/arnavsacheti/Documents/Ternary-Pi/sound_effects/wait_for_button.wav",
+                    ],
+                    check=True,
+                )
+            except FileNotFoundError:
+                print(
+                    "ALSA audio player not found. Please install it or use a different audio player."
+                )
             GPIO.wait_for_edge(PIN, GPIO.FALLING)  # blocks until LOW edge
-            print("Button pressed!")
+
+            try:
+                subprocess.run(
+                    [
+                        "aplay",
+                        "/home/arnavsacheti/Documents/Ternary-Pi/sound_effects/beep.wav",
+                    ],
+                    check=True,
+                )
+            except FileNotFoundError:
+                print(
+                    "ALSA audio player not found. Please install it or use a different audio player."
+                )
 
             ternary_pi(verbose=True)
     except KeyboardInterrupt:
